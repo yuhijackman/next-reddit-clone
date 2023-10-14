@@ -8,10 +8,12 @@ import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import axios, { AxiosError } from "axios";
 import { CreateSubredditPayload } from "@/lib/validators/subreddit";
+import { useCustomToast } from "@/hooks/use-custom-toast";
 
 const Page = () => {
   const router = useRouter();
   const [input, setInput] = useState<string>("");
+  const { loginToast } = useCustomToast();
 
   const { mutate: createCommunity, isLoading } = useMutation({
     mutationFn: async () => {
@@ -40,7 +42,7 @@ const Page = () => {
         }
 
         if (err.response?.status === 401) {
-          // return loginToast()
+          return loginToast();
         }
       }
 
