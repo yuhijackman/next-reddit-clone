@@ -51,6 +51,9 @@ const Page = () => {
         description: "Could not create subreddit.",
         variant: "destructive"
       });
+    },
+    onSuccess: (data) => {
+      router.push(`r/${data}`);
     }
   });
 
