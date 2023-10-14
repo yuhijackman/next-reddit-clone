@@ -86,6 +86,7 @@ model Post {
   content     Json?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  
   subreddit   Subreddit @relation(fields: [subredditId], references: [id])
   subredditId String
 
