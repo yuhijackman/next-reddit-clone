@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { PostValidator, PostCreationRequest } from "@/lib/validators/post";
 import type EditorJS from "@editorjs/editorjs";
 import { uploadFiles } from "@/lib/uploadthing";
+import { toast } from "@/hooks/use-toast";
 
 interface EditorProps {
   subredditId: string;
@@ -29,12 +30,6 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
   const ref = useRef<EditorJS>();
   const [isMounted, setIsMounted] = useState(false);
   const _titleRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setIsMounted(true);
-    }
-  }, []);
 
   const initializeEditor = useCallback(async () => {
     const EditorJS = (await import("@editorjs/editorjs")).default;
@@ -90,6 +85,24 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsMounted(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (Object.keys(errors).length) {
+      for (const [_key, value] of Object.entries(errors)) {
+        toast({
+          title: "Something went wrong",
+          description: (value as { message: string }).message,
+          variant: "destructive"
+        });
+      }
+    }
+  }, [errors]);
 
   useEffect(() => {
     const init = async () => {
