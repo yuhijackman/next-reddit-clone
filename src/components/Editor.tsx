@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useCallback, useRef } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,6 +27,14 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
   });
 
   const ref = useRef<EditorJS>();
+  const [isMounted, setIsMounted] = useState(false);
+  const _titleRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsMounted(true);
+    }
+  }, []);
 
   const initializeEditor = useCallback(async () => {
     const EditorJS = (await import("@editorjs/editorjs")).default;
@@ -49,7 +57,7 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
         inlineToolbar: true,
         data: { blocks: [] },
         tools: {
-          heeader: Header,
+          header: Header,
           linkTool: {
             class: LinkTool,
             config: {
@@ -83,14 +91,47 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
     }
   }, []);
 
+  useEffect(() => {
+    const init = async () => {
+      await initializeEditor();
+
+      setTimeout(() => {
+        _titleRef.current?.focus();
+      }, 0);
+    };
+
+    if (isMounted) {
+      init();
+
+      return () => {
+        // 4:43:00
+        ref.current?.destroy();
+        ref.current = undefined;
+      };
+    }
+  }, [isMounted, initializeEditor]);
+
+  const { ref: titleRef, ...rest } = register("title");
+
   return (
     <div className="w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200">
-      <form id="subreddit-post-form" className="w-fit" onSubmit={() => {}}>
+      <form
+        id="subreddit-post-form"
+        className="w-fit"
+        onSubmit={handleSubmit((e) => {})}
+      >
         <div className="prose prose-stone dark:prose-invert">
           <TextareaAutosize
+            ref={(e) => {
+              titleRef(e);
+              // @ts-ignore
+              _titleRef.current = e;
+            }}
+            {...rest}
             placeholder="title"
             className="w-full resize-none appearance-noe overflow-hidden bg-transparent text-5xl font-bold focus:outline-none"
           />
+          <div id="editor" className="min-h-[500px]" />
         </div>
       </form>
     </div>
