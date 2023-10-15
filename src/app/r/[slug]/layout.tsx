@@ -90,6 +90,7 @@ const Layout = async ({
                   subredditName={subreddit.name}
                 />
               ) : null}
+
               <Link
                 className={buttonVariants({
                   variant: "outline",
