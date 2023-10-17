@@ -3,19 +3,26 @@ import { User, Vote, Post } from "@prisma/client";
 import { MessageSquare } from "lucide-react";
 import { FC, useRef } from "react";
 import EditorOutput from "./EditorOutput";
+import PostVoteClient from "./post-vote/PostVoteClient";
+
+type PartialVote = Pick<Vote, "type">;
 
 interface PostProps {
-  subredditName: string;
   post: Post & {
     author: User;
     votes: Vote[];
   };
+  votesAmt: number;
+  currentVote?: PartialVote;
+  subredditName: string;
   commentAmt: number;
 }
 
 const Post: FC<PostProps> = ({
-  subredditName,
   post,
+  votesAmt,
+  currentVote,
+  subredditName,
   commentAmt
 }: PostProps) => {
   const pRef = useRef<HTMLDivElement>(null);
@@ -23,6 +30,12 @@ const Post: FC<PostProps> = ({
   return (
     <div className="rounded-md bg-white shadow">
       <div className="px-6 py-4 flex justify-between">
+        <PostVoteClient
+          postId={post.id}
+          initialVotesAmt={votesAmt}
+          initialVote={currentVote?.type}
+        />
+
         <div className="w-0 flex-1">
           <div className="max-h-40 mt-1 text-xs text-gray-500">
             {subredditName ? (
@@ -39,11 +52,13 @@ const Post: FC<PostProps> = ({
             <span>Posted by u/{post.author.name}</span>{" "}
             {formatTimeToNow(post.createdAt)}
           </div>
+
           <a href={`r/${subredditName}/post/${post.id}`}>
             <h1 className="text-lg font-semibold py-2 leading-6 text-gray-900">
               {post.title}
             </h1>
           </a>
+
           <div
             className="relative text-sm max-h-40 w-full overflow-clip"
             ref={pRef}
