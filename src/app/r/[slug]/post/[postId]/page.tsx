@@ -3,6 +3,7 @@ import { Post, User, Vote } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import PostVoteServer from "@/components/post-vote/PostVoteServer";
+import CommentsSection from "@/components/CommentsSection";
 import { buttonVariants } from "@/components/ui/Button";
 import { ArrowBigDown, ArrowBigUp, Loader2 } from "lucide-react";
 import EditorOutput from "@/components/EditorOutput";
@@ -62,13 +63,15 @@ const page = async ({ params }: PageProps) => {
           </h1>
 
           <EditorOutput content={post.content} />
-          {/* <Suspense
+
+          <Suspense
             fallback={
               <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
             }
           >
+            {/* @ts-expect-error Server Component */}
             <CommentsSection postId={post.id} />
-          </Suspense> */}
+          </Suspense>
         </div>
       </div>
     </div>
